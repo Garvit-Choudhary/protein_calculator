@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protein Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-image: url('protein_doodles.jpeg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 10px 0 5px;
+            text-align: left;
+        }
+        select, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        input{
+            width: 96%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        } 
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        h3 {
+            text-align: left;
+            margin-top: 8px;
+            color: #000;
+            font-size: 18px;
+        }
+        p {
+            text-align: left;
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Protein Calculator</h2>
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date">
+        
+        <label for="name">Patient Name:</label>
+        <input type="text" id="name" placeholder="Enter patient name">
+
+        <label for="weight">Body Weight (kg):</label>
+        <input type="number" id="weight" placeholder="Enter body weight">
+
+        <label for="category">Select Category:</label>
+        <select id="category">
+            <option value="healthy">Healthy</option>
+            <option value="pregnant">Pregnant</option>
+            <option value="lactating">Lactating</option>
+        </select>
+
+        <label for="food">Select Food:</label>
+        <select id="food">
+            <option value="bhakhri" data-protein="5">Bhakhri (1 piece)</option>
+            <option value="biscuit" data-protein="0.75">Biscuit/Cookie (1 packet)</option>
+            <option value="bread" data-protein="1.10">Bread (1 slice)</option>
+            <option value="burger" data-protein="10">Burger (chicken)</option>
+            <option value="buttermilk" data-protein="2">Buttermilk (1 glass)</option>
+            <option value="cheese" data-protein="4">Cheese (1 slice)</option>
+            <option value="corn" data-protein="0.08">Corn (1 bowl)</option>
+            <option value="curd" data-protein="0.04">Curd (Amul small pack)</option>
+            <option value="dal" data-protein="0.22">Dal (1 cup)</option>
+            <option value="dosa" data-protein="0.06">Dosa (1 plain dosa)</option>
+            <option value="drybean" data-protein="0.15">Dry Bean, Rajma, Chole, Sprouts (1 cup)</option>
+            <option value="egg" data-protein="6">Egg (1 large)</option>
+            <option value="fruits" data-protein="0.01">Fruits/Vegetables (1 cup)</option>
+            <option value="idli" data-protein="2">Idli Sambhar (1 piece)</option>
+            <option value="kadhi" data-protein="0.02">Kadhi (1 cup)</option>
+            <option value="khichadi" data-protein="0.03">Khichadi (1 cup)</option>
+            <option value="meat" data-protein="0.22">Meat/Non-Veg (1 portion)</option>
+            <option value="milk" data-protein="0.02">Milk (1 glass)</option>
+            <option value="coffee" data-protein="0.01">Milk Coffee (1 cup)</option>
+            <option value="tea" data-protein="0.01">Milk Tea (1 cup)</option>
+            <option value="nuts" data-protein="0.15">Nuts (Almonds, Cashews - 1 cup)</option>
+            <option value="paneer" data-protein="0.16">Paneer (1 cup)</option>
+            <option value="paratha" data-protein="3">Paratha (1 paratha)</option>
+            <option value="pizza" data-protein="2">Pizza (1 slice)</option>
+            <option value="poha" data-protein="0.04">Poha (1 cup)</option>
+            <option value="rice" data-protein="0.01">Rice (1 cup)</option>
+            <option value="roti" data-protein="2">Roti (1 roti)</option>
+            <option value="seafood" data-protein="0.20">Seafood (60g - 1 unit, prohibited in pregnancy)</option>
+            <option value="soya" data-protein="0.33">Soya Chunks (1 cup)</option>
+            <option value="tofu" data-protein="0.08">Tofu (1 cup)</option>
+            <option value="upma" data-protein="0.05">Upma (1 cup)</option>
+        </select>
+
+        <label for="quantity">Quantity Consumed:</label>
+        <input type="number" id="quantity" placeholder="Enter quantity">
+
+        <button onclick="calculateProtein()">Add Food</button>
+
+        <h3>Results</h3>
+        <p>Total Required Protein for the Individual: <span id="requiredProtein">0</span> g</p>
+        <p>Actual Total Protein Consumption: <span id="totalProtein">0</span> g</p>
+        <p>Required Protein to Fulfill Gap: <span id="proteinGap">0</span> g</p>
+        
+        <button onclick="exportToExcel()">Export to Excel</button>
+    </div>
+
+    <script>
+        let totalProtein = 0;
+        
+        function calculateProtein() {
+            let quantity = document.getElementById("quantity").value;
+            let foodSelect = document.getElementById("food");
+            let proteinPerUnit = parseFloat(foodSelect.options[foodSelect.selectedIndex].getAttribute("data-protein"));
+            
+            let obtainedProtein = quantity * proteinPerUnit;
+            totalProtein += obtainedProtein;
+            
+            let weight = document.getElementById("weight").value;
+            let category = document.getElementById("category").value;
+            let requiredProtein = parseFloat(weight);
+            if (category === "pregnant") requiredProtein += 8;
+            if (category === "lactating") requiredProtein += 20;
+            
+            document.getElementById("requiredProtein").innerText = requiredProtein.toFixed(2);
+            document.getElementById("totalProtein").innerText = totalProtein.toFixed(2);
+            document.getElementById("proteinGap").innerText = (requiredProtein - totalProtein).toFixed(2);
+        }
+    </script>
+    <script>
+            function exportToExcel() {
+            let name = document.getElementById("name").value;
+            let category = document.getElementById("category").value;
+            let requiredProtein = document.getElementById("requiredProtein").innerText;
+            let totalProtein = document.getElementById("totalProtein").innerText;
+            let proteinGap = document.getElementById("proteinGap").innerText;
+            
+            if (!name) {
+                alert("Please enter the patient's name before exporting.");
+                return;
+            }
+            
+            let data = [
+                ["Patient Name", "Category", "Required Protein (g)", "Actual Consumption (g)", "Protein Gap (g)"],
+                [name, category, requiredProtein, totalProtein, proteinGap]
+            ];
+            
+            let csvContent = "data:text/csv;charset=utf-8," + data.map(e => e.join(",")).join("\n");
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Protein_Calculation.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+    <script>
+        // Set today's date in the date input field
+        document.addEventListener("DOMContentLoaded", function() {
+          let today = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+          document.getElementById("date").value = today;
+        });
+    </script>
+</body>
+</html>
