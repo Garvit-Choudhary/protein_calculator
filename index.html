@@ -98,7 +98,7 @@
 
         <label for="food">Select Food:</label>
         <select id="food">
-            <option value="bhakhri" data-protein="5">Bhakhri (1 piece)</option>
+             <option value="bhakhri" data-protein="5">Bhakhri (1 piece)</option>
             <option value="biscuit" data-protein="0.75">Biscuit/Cookie (1 packet)</option>
             <option value="bread" data-protein="1.10">Bread (1 slice)</option>
             <option value="burger" data-protein="10">Burger (chicken)</option>
@@ -140,7 +140,7 @@
         <p>Total Required Protein for the Individual: <span id="requiredProtein">0</span> g</p>
         <p>Actual Total Protein Consumption: <span id="totalProtein">0</span> g</p>
         <p>Required Protein to Fulfill Gap: <span id="proteinGap">0</span> g</p>
-        
+        <button onclick="submitForm()">Submit</button>
         <button onclick="exportToExcel()">Export to Excel</button>
     </div>
 
@@ -166,34 +166,66 @@
             document.getElementById("proteinGap").innerText = (requiredProtein - totalProtein).toFixed(2);
         }
     </script>
-    <script>
-            function exportToExcel() {
-            let name = document.getElementById("name").value;
-            let category = document.getElementById("category").value;
-            let requiredProtein = document.getElementById("requiredProtein").innerText;
-            let totalProtein = document.getElementById("totalProtein").innerText;
-            let proteinGap = document.getElementById("proteinGap").innerText;
-            
-            if (!name) {
-                alert("Please enter the patient's name before exporting.");
-                return;
-            }
-            
-            let data = [
-                ["Patient Name", "Category", "Required Protein (g)", "Actual Consumption (g)", "Protein Gap (g)"],
-                [name, category, requiredProtein, totalProtein, proteinGap]
-            ];
-            
-            let csvContent = "data:text/csv;charset=utf-8," + data.map(e => e.join(",")).join("\n");
-            let encodedUri = encodeURI(csvContent);
-            let link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Protein_Calculation.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    </script>
+
+<script>
+    function submitForm() {
+        let date = document.getElementById("date").value;
+        let name = document.getElementById("name").value;
+        let weight = document.getElementById("weight").value;
+        let category = document.getElementById("category").value;
+        let totalProtein = document.getElementById("totalProtein").innerText;
+        let proteinGap = document.getElementById("proteinGap").innerText;
+        let requiredProtein = document.getElementById("requiredProtein").innerText;
+        let quantity = document.getElementById("quantity").value;
+
+        let formData = {
+            date: date,
+            name: name,
+            weight: weight,
+            category: category,
+            totalProtein: totalProtein,
+            proteinGap: proteinGap,
+            requiredProtein: requiredProtein,
+            quantity: quantity
+        };
+
+        localStorage.setItem("proteinData", JSON.stringify(formData));
+        alert("Form data saved!");
+
+        // Reset form
+        document.getElementById("date").value = new Date().toISOString().split('T')[0];
+        document.getElementById("name").value = "";
+        document.getElementById("weight").value = "";
+        document.getElementById("category").value = "healthy";
+        document.getElementById("totalProtein").innerText = "0";
+        document.getElementById("proteinGap").innerText = "0";
+        document.getElementById("requiredProtein").innerText = "0"; 
+        document.getElementById("quantity").value = ""; // Reset quantity field
+    }
+</script>
+<script>
+    function exportToExcel() {
+    let date = document.getElementById("date").value;
+    let name = document.getElementById("name").value;
+    let weight = document.getElementById("weight").value;
+    let category = document.getElementById("category").value;
+    let totalProtein = document.getElementById("totalProtein").innerText;
+    let proteinGap = document.getElementById("proteinGap").innerText;
+    let requiredProtein = document.getElementById("requiredProtein").innerText;
+
+    let csvContent = "Date,Name,Weight,Category,Total Protein,Protein Gap,Required Protein\n";
+    csvContent += `${date},${name},${weight},${category},${totalProtein},${proteinGap},${requiredProtein}\n`;
+
+    let blob = new Blob([csvContent], { type: "text/csv" });
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "protein_data.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+        
     <script>
         // Set today's date in the date input field
         document.addEventListener("DOMContentLoaded", function() {
